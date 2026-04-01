@@ -8,7 +8,6 @@ package modules
 
 import (
 	"fmt"
-	"html"
 	"strconv"
 	"strings"
 
