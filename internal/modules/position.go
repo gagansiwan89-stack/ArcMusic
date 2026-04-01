@@ -8,7 +8,6 @@ package modules
 
 import (
 	"fmt"
-	"html"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
