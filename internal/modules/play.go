@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"html"
 	"strconv"
 	"strings"
 	"time"
@@ -347,7 +346,7 @@ func prepareRoomAndSearchMessage(
 	searchStr := ""
 	if query != "" {
 		searchStr = F(chatID, "searching_query", locales.Arg{
-			"query": html.EscapeString(query),
+			"query": utils.EscapeHTML(query),
 		})
 	} else {
 		searchStr = F(chatID, "searching")
@@ -448,7 +447,7 @@ func filterAndTrimTracks(
 		if track.Duration > config.DurationLimit {
 			skippedTracks = append(
 				skippedTracks,
-				html.EscapeString(utils.ShortTitle(track.Title, 35)),
+				utils.EscapeHTML(utils.ShortTitle(track.Title, 35)),
 			)
 			continue
 		}
@@ -535,7 +534,7 @@ func playTracksAndRespond(
 
 	for i, track := range tracks {
 		track.Requester = mention
-		title := html.EscapeString(utils.ShortTitle(track.Title, 25))
+		title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 		var filePath string
 
 		// Download first track if needed
@@ -573,7 +572,7 @@ func playTracksAndRespond(
 				} else {
 					utils.EOR(replyMsg, F(chatID, "play_download_failed", locales.Arg{
 						"title": title,
-						"error": html.EscapeString(err.Error()),
+						"error": utils.EscapeHTML(err.Error()),
 					}))
 				}
 				return tg.ErrEndGroup
@@ -583,7 +582,6 @@ func playTracksAndRespond(
 			gologging.InfoF("Downloaded track to %s", filePath)
 		}
 
-		// 🔁 play with retry
 		if err := playTrackWithRetry(r, track, filePath, force && i == 0, replyMsg); err != nil {
 			return err
 		}
@@ -594,7 +592,7 @@ func playTracksAndRespond(
 
 	// ---------- Now Playing / Added to queue ----------
 	if !isActive || (force && len(tracks) > 0) {
-		title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
+		title := utils.EscapeHTML(utils.ShortTitle(mainTrack.Title, 25))
 		btn := core.GetPlayMarkup(chatID, r, false)
 
 		opt := &tg.SendOptions{
@@ -637,7 +635,7 @@ func playTracksAndRespond(
 	} else {
 		// QUEUE MESSAGE - THUMBNAIL LOGIC REMOVED HERE
 		if len(tracks) == 1 {
-			title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
+			title := utils.EscapeHTML(utils.ShortTitle(mainTrack.Title, 25))
 			btn := core.GetPlayMarkup(chatID, r, true)
 			opt := &tg.SendOptions{
 				ParseMode:   "HTML",
